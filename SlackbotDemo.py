@@ -27,11 +27,11 @@ logger = logging.getLogger(__name__)
 # except SlackApiError as e:
 #     print(f"Error: {e}")
 
-file_name = './michael_what.jpeg'
+file_name = './memes/michael_what.jpeg'
 channel_id = 'C02FU1DQSAK'
 try:
   response = client.files_upload(
-    channel='hackathon',
+    channel=channel_id,
     initial_comment="hey",
     file=file_name
   )
