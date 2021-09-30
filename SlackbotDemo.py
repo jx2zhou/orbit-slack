@@ -3,6 +3,7 @@ from slack import WebClient
 from slack.errors import SlackApiError
 import random
 import os
+from enum import Enum
 
 #authentication token to connect to slackboss and create web client.
 #do NOT save auth_token in public repo or we will automatically be forced
@@ -30,9 +31,9 @@ def checkChannel(myChannel):
     for response in all_channels:
             for channel in response["channels"]:
                 if channel["name"] == myChannel:
-                    print(f"Found conversation ID:",channel["id"])
+                    print(f"Found conversation ID:", channel["id"])
                     return channel["id"]
-    print("We couldn'y find a group with that name, sorry!")
+    print("We couldn't find a group with that name, sorry!")
     return None
 
 ###Message sender: sends message to channel (will be expanded to send to people
@@ -88,6 +89,21 @@ def sendRandomMeme(destinationChannel, title, message = "Commencing Meme Blast..
     sendImage(destinationChannel, message, image)
 
 
+class MsgType(Enum):
+  ENCOURAGE = 'Encourage'
+  TAKEBREAK = 'TakeBreak'
+  WORK = 'Work'
+
+# based on sendRandomMeme function
+def sendRandomMessage(destinationChannel, msg_type:MsgType):
+    curr_directory = os.path.dirname(__file__)
+    local_path = "Memes/Words/" + msg_type.value + ".txt"
+    text_file_path = os.path.join(curr_directory, local_path)
+    text_file = open(text_file_path, "r")
+    list_of_msgs = text_file.readlines()
+    selected_text = random.choice(list_of_msgs)
+    sendText(destinationChannel, selected_text)
+
 #test the functionality
 def TestFunctions():
     id = checkChannel("hackathon")
@@ -97,6 +113,7 @@ def TestFunctions():
     #attachments = [{"title": "Take Your Break!!!", "image_url": image_url}]
     #sendImage(id, "Commencing Meme Blast...", attachments)
     
-    sendRandomMeme(id, "Take A Break Now!!!")
+    # sendRandomMeme(id, "Take A Break Now!!!")
+    sendRandomMessage(id, MsgType.TAKEBREAK)
 
 TestFunctions()
