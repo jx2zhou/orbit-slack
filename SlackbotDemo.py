@@ -7,7 +7,6 @@ client = WebClient(token=auth_token)
 
 ###Initial Connection to Slackboss
 ##Attempts connection
-
 ##Testing connection - terminate program on failed connection (work in progress)
 # connected = client.rtm_connect(with_team_state=False)
 # if connected['ok'] == False:
@@ -19,30 +18,51 @@ client = WebClient(token=auth_token)
 ##Attempt connection to specified channel
 #return error on failure
 #*note: plz readd slackboss app to any channels after changing auth token
-try:
-  response = client.chat_postMessage(
-    channel="hackathon",
-    text="Hello from your Slackboss version -2!"
-  )
-except SlackApiError as e:
-  # You will get a SlackApiError if "ok" is False
-  assert e.response["error"]  # str like 'invalid_auth', 'channel_not_found'
-
-
-
-###channel Checking (work in progress)
-#
-# channel_name = "hackathon"
-# conversation_id = None
 # try:
-#     # Call the conversations.list method using the WebClient
-#     result = client.conversations_list()
-#     if conversation_id is not None:
-#         for channel in result["channels"]:
-#             if channel["name"] == channel_name:
-#                 conversation_id = channel["id"]
-#                 #Print result
-#                 print(f"Found conversation ID: {conversation_id}")
-#
+#   response = client.chat_postMessage(
+#     channel="hackathon",
+#     text="Hello from your Slackboss version -2!"
+#   )
 # except SlackApiError as e:
-#     print(f"Error: {e}")
+#   # You will get a SlackApiError if "ok" is False
+#   assert e.response["error"]  # str like 'invalid_auth', 'channel_not_found'
+
+
+
+#dev tools for your use
+
+###Channel Checker: tells you the conversation id of a channel and if it exists
+#input: string, channel you are looking for
+#output: string, conversation ID, returns None if the conversation doesn't exist
+def checkChannel(myChannel):
+    all_channels = client.conversations_list()
+    for response in all_channels:
+            for channel in response["channels"]:
+                if channel["name"] == myChannel:
+                    print(f"Found conversation ID:",channel["id"])
+                    return channel["id"]
+    print("We couldn'y find a group with that name, sorry!")
+    return None
+
+###Message sender: sends message to channel (will be expanded to send to people
+#and multiple groups)
+#input: (string, string). (channel name of destination*or conversationID, text Message)
+#output: None
+def sendMessage(destinationChannel, message):
+    try:
+      response = client.chat_postMessage(
+        channel=destinationChannel,
+        text=message
+      )
+      print("Message sent to", destinationChannel, "successfully!")
+    except SlackApiError as e:
+      # You will get a SlackApiError if "ok" is False
+      assert e.response["error"]  # str like 'invalid_auth', 'channel_not_found'
+
+#test the functionality
+def TestFunctions():
+    id = checkChannel("hackathon")
+    sendMessage(id, "This function is working correctly")
+
+
+TestFunctions()
