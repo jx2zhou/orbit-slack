@@ -46,9 +46,9 @@ def checkChannel(myChannel):
 
 ###Message sender: sends message to channel (will be expanded to send to people
 #and multiple groups)
-#input: (string, string). (channel name of destination*or conversationID, text Message)
+#input: (string, string, optional strnig). (channel name of destination*or conversationID, text Message, attachment file path)
 #output: None
-def sendMessage(destinationChannel, message):
+def sendText(destinationChannel, message, attachments = None):
     try:
       response = client.chat_postMessage(
         channel=destinationChannel,
@@ -59,10 +59,32 @@ def sendMessage(destinationChannel, message):
       # You will get a SlackApiError if "ok" is False
       assert e.response["error"]  # str like 'invalid_auth', 'channel_not_found'
 
+##builds attachment in correct format to be sent to slackboss
+#input: string, string. image title and image image_url
+#output: dictionary preformated to be sent to slackboss
+#*optional: add feature to build atachment but also select random attachment from list
+def buildAttachment(imageTitle, imageLink):
+    return [{"title": imageTitle, "image_url": imageLink}]
+
+
+def sendImage(destinationChannel, message, image = None):
+    try:
+      response = client.chat_postMessage(
+        channel=destinationChannel,
+        text=message,
+        attachments = image
+      )
+      print("Message sent to", destinationChannel, "successfully!")
+    except SlackApiError as e:
+      # You will get a SlackApiError if "ok" is False
+      assert e.response["error"]  # str like 'invalid_auth', 'channel_not_found'
+
 #test the functionality
 def TestFunctions():
     id = checkChannel("hackathon")
-    sendMessage(id, "This function is working correctly")
-
+    #sendText(id, "This function is working correctly")
+    image_url = "https://preview.redd.it/d27xt93ygln61.jpg?width=960&crop=smart&auto=webp&s=471e03e28f6d3a903e9d0f004aa7141711efbc7b"
+    attachments = [{"title": "Take Your Break!!!", "image_url": image_url}]
+    sendImage(id, "Commencing Meme Blast...", attachments)
 
 TestFunctions()
