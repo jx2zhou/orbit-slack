@@ -18,7 +18,9 @@ import math
 #do NOT save auth_token in public repo or we will automatically be forced
 #to recreate the auth tocken and re-add slackbot to channels
 auth_token = "xoxb-2538044939847-2546117567878-Q548dhVCnL8I2v3dt4oylnuZ"
+user_token ="xoxp-2538044939847-2565386880881-2543059939895-826f6a444d8a2a76c9e457bdfbd0f17f"
 client = WebClient(token=auth_token)
+user_client = WebClient(token=user_token)
 
 ###Initial Connection to Slackboss
 ##Attempts connection
@@ -145,8 +147,8 @@ def createCalender():
 def setDoNotDisturb(destinationChannel, time):
     try:
         message = "Do Not Disturb set for {} minutes".format(time)
-        sendText(destinationChannel, message)
-        response = client.dnd_setSnooze(num_minutes=time)
+        #sendText(destinationChannel, message)
+        response = user_client.dnd_setSnooze(num_minutes =1)
         print("Began do not disturb time")
     except SlackApiError as e:
         print("Failed to set do not disturb time")
@@ -201,19 +203,29 @@ def start_break_timer(id, minutes):
 def TestFunctions():
     # word= "test"
     # print(word[1:])
-    id = checkChannel("hackathon")
-    workday_is_over = False
-    calender = createCalender()
-    while not workday_is_over:
-        time_to_break, duration = findNextBreak(calender)
-        if time_to_break == None:
-            print("No more breaks today!")
-            sendText(id, "No more breaks today!! Final Stretch!")
-        else:
-            sendText(id, str(time_to_break)+" mins until next break!")
-            time.sleep(time_to_break*60)
 
-            start_break_timer(id, duration)
+    #client.setDoNotDisturb()
+
+
+    id = checkChannel("hackathon")
+
+    setDoNotDisturb(id, 2)
+
+
+    # workday_is_over = False
+    # calender = createCalender()
+    # while not workday_is_over:
+    #     time_to_break, duration = findNextBreak(calender)
+    #     if time_to_break == None:
+    #         print("No more breaks today!")
+    #         sendText(id, "No more breaks today!! Final Stretch!")
+    #     else:
+    #         sendText(id, str(time_to_break)+" mins until next break!")
+    #         time.sleep(time_to_break*60)
+    #
+    #         start_break_timer(id, duration)
+
+
     #start_timer(1)
 
     #sendText(id, "This function is working correctly")
@@ -221,6 +233,6 @@ def TestFunctions():
     #attachments = [{"title": "Take Your Break!!!", "image_url": image_url}]
     #sendImage(id, "Commencing Meme Blast...", attachments)
 
-    sendRandomMeme(id, "Take A Break Now!!!")
+    # sendRandomMeme(id, "Take A Break Now!!!")
 
 TestFunctions()
