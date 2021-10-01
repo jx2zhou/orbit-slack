@@ -125,7 +125,7 @@ def createCalender():
     break2 = (17.05 * 60, 30)
     break3 = (17.05 * 60, 30)
 
-    cal["September"][30] = [break1, break2, break3]#day 30 is position 31. pairs are (break time pst, break duration in mins)
+    cal["October"][1] = [break1, break2, break3]#day 30 is position 31. pairs are (break time pst, break duration in mins)
     return cal
 
 #############DEPRECATED#########################
@@ -137,6 +137,21 @@ def createCalender():
 #     current_time = now.strftime("%H:%M")
 #     print("Current Time =", current_time)
 #############DEPRECATED#########################
+
+
+#this mightneed to be done for only one user at a time rather than in a channel
+#link to Slack Api method https://api.slack.com/methods/dnd.setSnooze
+#have this go when it is break time, set time length to the same as the break length
+def setDoNotDisturb(destinationChannel, time):
+    try:
+        message = "Do Not Disturb set for {} minutes".format(time)
+        sendText(destinationChannel, message)
+        response = client.dnd_setSnooze(num_minutes=time)
+        print("Began do not disturb time")
+    except SlackApiError as e:
+        print("Failed to set do not disturb time")
+        assert e.response["error"]
+
 
 
 ##function helps calculate the number of minutes until the next break, it also remembers the duration of that break
