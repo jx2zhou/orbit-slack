@@ -8,6 +8,8 @@ from slack import WebClient
 from slack.errors import SlackApiError
 import random
 import os
+from enum import Enum
+
 import time
 #so you can schedule breaks
 from datetime import datetime
@@ -41,7 +43,7 @@ def checkChannel(myChannel):
     for response in all_channels:
             for channel in response["channels"]:
                 if channel["name"] == myChannel:
-                    print(f"Found conversation ID:",channel["id"])
+                    print(f"Found conversation ID:", channel["id"])
                     return channel["id"]
     print("We couldn't find a group with that name, sorry!")
     return None
@@ -105,6 +107,21 @@ def sendRandomMeme(destinationChannel, title, message = "Commencing Meme Blast..
     image = [{"title": title, "image_url": selected_meme}]
     sendImage(destinationChannel, message, image)
 
+
+class MsgType(Enum):
+  ENCOURAGE = 'Encourage'
+  TAKEBREAK = 'TakeBreak'
+  WORK = 'Work'
+
+# based on sendRandomMeme function
+def sendRandomMessage(destinationChannel, msg_type:MsgType):
+    curr_directory = os.path.dirname(__file__)
+    local_path = "Memes/Words/" + msg_type.value + ".txt"
+    text_file_path = os.path.join(curr_directory, local_path)
+    text_file = open(text_file_path, "r")
+    list_of_msgs = text_file.readlines()
+    selected_text = random.choice(list_of_msgs)
+    sendText(destinationChannel, selected_text)
 
 #creates a dictionary calender that stores the break plans for each day
 #only for septamber,october as of now for testing purposes
@@ -220,6 +237,9 @@ def TestFunctions():
     #image_url = "https://pics.awwmemes.com/need-dis-sleepy-la-paresse-on-twitter-almost-lunch-time-54243381.png"
     #attachments = [{"title": "Take Your Break!!!", "image_url": image_url}]
     #sendImage(id, "Commencing Meme Blast...", attachments)
+    
+    # sendRandomMeme(id, "Take A Break Now!!!")
+    sendRandomMessage(id, MsgType.TAKEBREAK)
 
     sendRandomMeme(id, "Take A Break Now!!!")
 
