@@ -142,7 +142,7 @@ def createCalender():
     break2 = (17.05 * 60, 30)
     break3 = (17.05 * 60, 30)
 
-    cal["September"][30] = [break1, break2, break3]#day 30 is position 31. pairs are (break time pst, break duration in mins)
+    cal["October"][1] = [break1, break2, break3]#day 30 is position 31. pairs are (break time pst, break duration in mins)
     return cal
 
 #############DEPRECATED#########################
