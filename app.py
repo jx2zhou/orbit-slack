@@ -112,10 +112,12 @@ def interact_handler():
     original_message_ts = payload['message_ts']
 
     if callback_id == "confirm_break_button":
-        response = client.chat_postMessage(channel=channel_id, text="Ok! Good job!")
+        pass
 
     elif callback_id == 'start_timer':
-        on_break=True
+        waiting_for_break = False
+        in_break = True
+        response = client.chat_postMessage(channel=channel_id, text="Ok! Good job! You are on break!")
 
     elif callback_id == 'activate_button':
         client.chat_update(channel=channel_id, ts=original_message_ts, text='Ok, Slackboss is activated!', attachments=[])
@@ -312,7 +314,7 @@ def createCalender():
     #this means at 12:30 there will be a 5 min break. Convert hours to minute by multiplying by 60!!!
     break2 = (14.66 * 60, 30)
     break3 = (15 * 60, 30)
-    break4 = (16 * 60, 30)
+    break4 = (16.47 * 60, 30)
 
     cal["October"][1] = [break1, break2, break3, break4, (1400 * 60, 5)]#day 30 is position 31. pairs are (break time pst, break duration in mins)
     return cal
@@ -364,6 +366,7 @@ def findNextBreak(calender):
 
 
 id = checkChannel("hackathon")
+id = 'U02GMBCRWRX'
 # setDoNotDisturb(id, 2)
 workday_is_over = False
 calender = createCalender()
@@ -372,12 +375,24 @@ counter = 0
 time_to_break, duration = findNextBreak(calender)
 break_duration = 0
 on_break=False
+waiting_for_break = False
+waiting_timer = 0
 
 @app.route("/poll")
 def poll_handler():
-    global time_to_break, in_break, counter, break_duration, workday_is_over, duration, on_break
+    global time_to_break, in_break, counter, break_duration, workday_is_over, duration, on_break, waiting_for_break, waiting_timer
     time.sleep(1)
-    if time_to_break == None:
+
+    if waiting_for_break:
+        if waiting_timer == 30:
+            sendText(id, 'Youse got 30 seconds to click that button')
+        if waiting_timer >= 60:
+            sendText(id, 'Too late, you gotta deal with Accountability Buddy (tm)')
+            waiting_for_break = False
+            sendText('U02H32JVDHN', 'Tell your friend to take their break!')
+        waiting_timer += 1
+
+    elif time_to_break == None:
         print("No more breaks today!")
         sendText(id, "No more breaks today!! Final Stretch!")
 
@@ -387,6 +402,7 @@ def poll_handler():
             sendText(id, "Break will end in " + str(duration - break_duration / 60))
             # for i in range(minutes * 60):
             #     time.sleep(1)
+
         break_duration += 1
         if break_duration >= duration * 60:
             sendText(id, "The break is over, back to work!!")
@@ -398,59 +414,24 @@ def poll_handler():
             sendText(id, str(time_to_break)+" mins until next break!")
 
         if time_to_break <= 0:
-            sendRandomMeme(id, "Take A Break Now!!!")
+            # sendRandomMeme(id, "Take A Break Now!!!")
             sendText(id, '', attachments=start_timer_button)
             not_on_break_timer=0
-            while not on_break:
-                if not_on_break_timer==300:
-                    sendText('U02H32JVDHN', 'Tell your friend to take their break!')
-                    break
-                not_on_break_timer+=1
-            sendText(id, "Break will end in " + str(duration))
-            in_break = True    
+            waiting_for_break = True
+            waiting_timer = 0
+            break_duration = 0
+
+            # while not on_break:
+            #     if not_on_break_timer==300:
+            #         sendText('U02H32JVDHN', 'Tell your friend to take their break!')
+            #         break
+            #     not_on_break_timer+=1
+            # sendText(id, "Break will end in " + str(duration))
+            # in_break = True    
         # start_break_timer(id, duration)
     print(counter, time_to_break, duration, break_duration)
     time_to_break -= 1.0 / 60
     counter += 1
     return ''
 
-#test the functionality
-# def TestFunctions():
-    # sendText('U02H32JVDHN', '', attachments=start_timer_button)
-    # start_break_timer('U02H32JVDHN', 2)
-#     while not workday_is_over:
-#         time.sleep(1)
-#         if time_to_break == None:
-#             print("No more breaks today!")
-#             sendText(id, "No more breaks today!! Final Stretch!")
-
-#         elif in_break:
-#             sendRandomMeme(id, "Take A Break Now!!!")
-#             sendText(id, "Break will end in " + str(minutes))
-#             for i in range(minutes * 60):
-#                 time.sleep(1)
-#             sendText(id, "The break is over, back to work!!")
-#             in_break = False
-#             time_to_break, duration = findNextBreak(calender)
-#         else:
-#             if counter % (60 * 10) == 0:
-#                 sendText(id, str(time_to_break)+" mins until next break!")
-
-#             if time_to_break <= 1:
-#                 in_break = True    
-#             # start_break_timer(id, duration)
-#         print(counter)
-#         counter += 1
-
-    # start_timer(1)
-
-    # sendText(id, "This function is working correctly")
-    # image_url = "https://pics.awwmemes.com/need-dis-sleepy-la-paresse-on-twitter-almost-lunch-time-54243381.png"
-    # attachments = [{"title": "Take Your Break!!!", "image_url": image_url}]
-    # sendImage(id, "Commencing Meme Blast...", attachments)
-
-    # sendRandomMeme(id, "Take A Break Now!!!")
-
-# TestFunctions()
-
-
+# sendText(id, '', attachments=start_timer_button)
