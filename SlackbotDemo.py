@@ -8,15 +8,13 @@ from slack import WebClient
 from slack.errors import SlackApiError
 import random
 import os
-<<<<<<< HEAD
 from enum import Enum
-=======
+
 import time
 #so you can schedule breaks
 from datetime import datetime
 from datetime import date
 import math
->>>>>>> main
 
 #authentication token to connect to slackboss and create web client.
 #do NOT save auth_token in public repo or we will automatically be forced
@@ -110,7 +108,6 @@ def sendRandomMeme(destinationChannel, title, message = "Commencing Meme Blast..
     sendImage(destinationChannel, message, image)
 
 
-<<<<<<< HEAD
 class MsgType(Enum):
   ENCOURAGE = 'Encourage'
   TAKEBREAK = 'TakeBreak'
@@ -125,7 +122,7 @@ def sendRandomMessage(destinationChannel, msg_type:MsgType):
     list_of_msgs = text_file.readlines()
     selected_text = random.choice(list_of_msgs)
     sendText(destinationChannel, selected_text)
-=======
+
 #creates a dictionary calender that stores the break plans for each day
 #only for septamber,october as of now for testing purposes
 ###months will have a list of days and each day will have its own list of breaks. each days
@@ -201,7 +198,6 @@ def start_break_timer(id, minutes):
     for i in range(minutes):
         time.sleep(60)
     sendText(id, "The break is over, back to work!!")
->>>>>>> main
 
 #test the functionality
 def TestFunctions():
@@ -226,13 +222,10 @@ def TestFunctions():
     #image_url = "https://pics.awwmemes.com/need-dis-sleepy-la-paresse-on-twitter-almost-lunch-time-54243381.png"
     #attachments = [{"title": "Take Your Break!!!", "image_url": image_url}]
     #sendImage(id, "Commencing Meme Blast...", attachments)
-<<<<<<< HEAD
     
     # sendRandomMeme(id, "Take A Break Now!!!")
     sendRandomMessage(id, MsgType.TAKEBREAK)
-=======
 
     sendRandomMeme(id, "Take A Break Now!!!")
->>>>>>> main
 
 TestFunctions()
